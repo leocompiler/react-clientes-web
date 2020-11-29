@@ -1,5 +1,5 @@
 # React Clientes Web 1.0
-* React project example for implants technologies.
+* Sistema web para demostrar desenvolvimento de tecnologias Web e Server.
 * Aplicativo para gestão de clientes, foi desenvolvido com ReactJs e MaterializeCSS.
  # Tecnologias
 <ul>
