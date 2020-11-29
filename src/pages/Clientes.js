@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import M from "materialize-css";
 import api from '../connection/api';
 import Tools from '../tools/tools'
+import IMask from 'imask';
 
 class Clientes extends Component {
 
@@ -83,7 +84,7 @@ class Clientes extends Component {
 
 
     try {
-      const response = await api.put('/telefones', { cliente, numero, tipoTelefone }, {
+      const response = await api.post('/telefones', { cliente, numero, tipoTelefone }, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token_user')}`
@@ -103,7 +104,7 @@ class Clientes extends Component {
 
 
     try {
-      const response = await api.put('/email', { cliente, email }, {
+      const response = await api.post('/email', { cliente, email }, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token_user')}`
@@ -138,12 +139,50 @@ class Clientes extends Component {
       return M.toast({ html: error })
     }
   }
+  async service_get_cep(cep) {
+    try {
+      let { endereco } = this.state
 
+      if (cep.length < 8) {
+        if (endereco.cep.length == 8) {
+          endereco = {}
+          this.setState({ endereco })
+          document.querySelectorAll("input").forEach(i => i.value = '')
+
+        }
+        return cep
+      }
+
+
+
+      const url = 'https://viacep.com.br/ws/' + cep + '/json/'
+      const response = await api.get(url, {
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (response.status == 200) {
+        const retorno = response.data
+        endereco = {
+          "cep": retorno.cep.replace("-", ""),
+
+          "logradouro": retorno.logradouro,
+          "bairro": retorno.bairro,
+          "cidade": retorno.localidade,
+          "uf": retorno.uf
+        }
+        this.setState({ endereco })
+        return cep
+      }
+
+
+    } catch (error) { console.log(error) }
+
+  }
 
 
 
 
   open_Modal(type, item) {
+    let ctx = this
     document.querySelectorAll("input").forEach(i => i.value = '')
     document.querySelectorAll("select").forEach(i => i.value = '')
     document.querySelectorAll("textarea").forEach(i => i.value = '')
@@ -157,6 +196,18 @@ class Clientes extends Component {
         var elems = document.querySelectorAll('select');
         M.FormSelect.init(elems, {});
         console.log("onOpenEnd")
+
+
+        var inputCpf = IMask(document.getElementById("cpfInput"), {
+          mask: '000.000.000-00',
+          maxLength: 11
+        });
+        inputCpf.on("complete", function () {
+          const cpf = inputCpf.unmaskedValue
+          ctx.state.item.cpf = cpf
+          ctx.setState({ item: item })
+
+        });
       }
 
     });
@@ -180,7 +231,7 @@ class Clientes extends Component {
         <td onClick={() => { this.open_Modal('modal_edit', item) }} > <span className={(!item.ativo ? 'red-text text-accent-4' : 'green-text')} >{item.nome} </span></td>
         <td onClick={() => { this.open_Modal('modal_edit', item) }}>{item.cpf}</td>
         <td onClick={() => { this.open_Modal('modal_edit', item) }}>{item.telefones.length > 0 ? item.telefones[0].numero : '-'}</td>
-        <td onClick={() => { this.open_Modal('modal_edit', item) }}>{item.emails[0].email}</td>
+        <td onClick={() => { this.open_Modal('modal_edit', item) }}>{ item.emails.length> 0 ? item.emails[0].email : '-'}</td>
         <td>
           <a class="btn-floating " style={{ margin: '0 16px' }} onClick={() => this.open_Modal('modal_telefones', item)} >
             <i class="material-icons" style={{ color: "white" }}>  settings_phone </i>
@@ -325,7 +376,7 @@ class Clientes extends Component {
     });
     return !item ? (<></>) :
       (
-        <div id="modal_edit" className={"modal " + (item.id? 'modal-fixed-footer' : '')}>
+        <div id="modal_edit" className={"modal " + (item.id ? 'modal-fixed-footer' : '')}>
           <div class="modal-content">
             <h4>{item.nome}</h4>
 
@@ -334,6 +385,7 @@ class Clientes extends Component {
               <div class="row">
                 <div class="input-field col s12 m6">
                   <input
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
                     value={item.nome}
                     onChange={e => { item.nome = e.target.value; this.setState({ item }) }}
@@ -342,10 +394,13 @@ class Clientes extends Component {
                 </div>
                 <div class="input-field col s12 m6">
                   <input
+                    id="cpfInput"
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
-                    type="number"
+                    type="text"
                     value={item.cpf}
                     onChange={e => { item.cpf = e.target.value; this.setState({ item }) }}
+
                   />
                   <label class="active" for="last_name">Cpf</label>
                 </div>
@@ -353,14 +408,16 @@ class Clientes extends Component {
 
                 <div class="input-field col s12 m6">
                   <input
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
                     type="number"
                     value={endereco.cep}
-                    onChange={e => { endereco.cep = e.target.value; this.setState({ endereco }) }} />
+                    onChange={e => { this.service_get_cep(e.target.value) }} />
                   <label class="active" for="last_name">Cep</label>
                 </div>
                 <div class="input-field col s12 m6">
                   <input
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
                     value={endereco.complemento}
 
@@ -371,6 +428,7 @@ class Clientes extends Component {
 
                 <div class="input-field col s12 m4">
                   <input
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
                     value={endereco.logradouro}
 
@@ -380,6 +438,7 @@ class Clientes extends Component {
 
                 <div class="input-field col s12 m3">
                   <input
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
                     value={endereco ? endereco.bairro : ''}
 
@@ -389,6 +448,7 @@ class Clientes extends Component {
 
                 <div class="input-field col s12 m3">
                   <input
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
                     value={endereco.cidade}
 
@@ -398,6 +458,7 @@ class Clientes extends Component {
 
                 <div class="input-field col s12 m2">
                   <input
+                    disabled={(item.id) ? "disabled" : ""}
                     class="input-group form-control"
                     value={endereco.uf}
 
@@ -409,7 +470,7 @@ class Clientes extends Component {
               </div>
 
             </form>
-            <div  className={'section ' + (!item.id ? 'hide' : '')} >
+            <div className={'section ' + (!item.id ? 'hide' : '')} >
               {this.modal_edit_telefones()}
               {this.modal_edit_emails()}
             </div>
