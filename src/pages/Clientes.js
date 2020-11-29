@@ -13,8 +13,8 @@ class Clientes extends Component {
       medidas: [],
       item: {},
       endereco: {},
-      email:{},
-      telefone:{},
+      email: {},
+      telefone: {},
       perfis: [],
       finish_search: false,
       logado: true,
@@ -79,11 +79,11 @@ class Clientes extends Component {
 
   }
 
-  async services_telefone({ cliente ,  numero , tipoTelefone }) {
+  async services_telefone({ cliente, numero, tipoTelefone }) {
 
 
     try {
-      const response = await api.put('/telefones', { cliente,numero,tipoTelefone }, {
+      const response = await api.put('/telefones', { cliente, numero, tipoTelefone }, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token_user')}`
@@ -95,15 +95,15 @@ class Clientes extends Component {
       }
     } catch (error) {
       console.log(error.response)
-      return M.toast({ html: error } )
+      return M.toast({ html: error })
     }
 
   }
-  async services_email({ cliente ,  email }) {
+  async services_email({ cliente, email }) {
 
 
     try {
-      const response = await api.put('/telefones', { cliente,email }, {
+      const response = await api.put('/email', { cliente, email }, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token_user')}`
@@ -115,7 +115,7 @@ class Clientes extends Component {
       }
     } catch (error) {
       console.log(error.response)
-      return M.toast({ html: error } )
+      return M.toast({ html: error })
     }
 
   }
@@ -134,11 +134,12 @@ class Clientes extends Component {
 
       }
     } catch (error) {
-      return M.toast({ html: Tools.getErroByServices(error) })
+      console.log(error.response)
+      return M.toast({ html: error })
     }
   }
 
- 
+
 
 
 
@@ -180,7 +181,15 @@ class Clientes extends Component {
         <td onClick={() => { this.open_Modal('modal_edit', item) }}>{item.cpf}</td>
         <td onClick={() => { this.open_Modal('modal_edit', item) }}>{item.telefones.length > 0 ? item.telefones[0].numero : '-'}</td>
         <td onClick={() => { this.open_Modal('modal_edit', item) }}>{item.emails[0].email}</td>
+        <td>
+          <a class="btn-floating " style={{ margin: '0 16px' }} onClick={() => this.open_Modal('modal_telefones', item)} >
+            <i class="material-icons" style={{ color: "white" }}>  settings_phone </i>
+          </a>
+          <a class="btn-floating red" onClick={() => this.open_Modal('modal_emails', item)}>
+            <i class="material-icons" style={{ color: "white" }}> mail </i>
+          </a>
 
+        </td>
       </tr>
     )
   }
@@ -205,7 +214,7 @@ class Clientes extends Component {
 
   modal_telefones() {
     let { item, telefone } = this.state;
-    telefone.cliente = { id : item.id}
+    telefone.cliente = { id: item.id }
     var elems = document.querySelectorAll('.materialboxed');
     M.Materialbox.init(elems, {});
 
@@ -219,11 +228,11 @@ class Clientes extends Component {
             <form action="#">
 
               <div class="input-field col s12 m4">
-                <select value={ telefone.tipoTelefone} 
-                onChange={e => { 
-                  telefone.tipoTelefone = e.target.value; 
-                  this.setState({ telefone  }) 
-                }}>
+                <select value={telefone.tipoTelefone}
+                  onChange={e => {
+                    telefone.tipoTelefone = e.target.value;
+                    this.setState({ telefone })
+                  }}>
                   <option value="" selected>Selecione</option>
                   <option value="CELULAR">CELULAR</option>
                   <option value="RESIDENCIAL">RESIDENCIAL</option>
@@ -236,9 +245,9 @@ class Clientes extends Component {
                   class="input-group form-control"
                   value={telefone.numero}
                   placeholder="00 0000 0000"
-                  onChange={e => { 
+                  onChange={e => {
                     telefone.numero = e.target.value;
-                    this.setState({ telefone  }) 
+                    this.setState({ telefone })
                   }}
                 />
                 <label class="active" for="last_name">Numero Telefonico</label>
@@ -252,7 +261,7 @@ class Clientes extends Component {
         </div>
         <div class="modal-footer">
           <a class="waves-effect waves-green btn-flat" onClick={() => this.close_Modal('modal_telefones')}>Voltar</a>
-          <a class="waves-effect waves-green btn-flat" onClick={() => this.services_telefone( telefone )}>Salvar</a>
+          <a class="waves-effect waves-green btn-flat" onClick={() => this.services_telefone(telefone)}>Salvar</a>
         </div>
 
       </div>
@@ -260,7 +269,7 @@ class Clientes extends Component {
   }
   modal_emails() {
     let { item, email } = this.state;
-    email.cliente = { id : item.id}
+    email.cliente = { id: item.id }
     var elems = document.querySelectorAll('.materialboxed');
     M.Materialbox.init(elems, {});
 
@@ -273,15 +282,15 @@ class Clientes extends Component {
           <div class="section row">
             <form action="#">
 
-               
+
               <div class="input-field col s12 m12">
                 <input
                   class="input-group form-control"
                   value={email.email}
                   placeholder="email@email.email"
-                  onChange={e => { 
+                  onChange={e => {
                     email.email = e.target.value;
-                    this.setState({ email  }) 
+                    this.setState({ email })
                   }}
                 />
                 <label class="active" for="last_name">Email</label>
@@ -295,7 +304,7 @@ class Clientes extends Component {
         </div>
         <div class="modal-footer">
           <a class="waves-effect waves-green btn-flat" onClick={() => this.close_Modal('modal_emails')}>Voltar</a>
-          <a class="waves-effect waves-green btn-flat" onClick={() => this.services_email( email )}>Salvar</a>
+          <a class="waves-effect waves-green btn-flat" onClick={() => this.services_email(email)}>Salvar</a>
         </div>
 
       </div>
@@ -305,6 +314,9 @@ class Clientes extends Component {
 
     let { item, endereco } = this.state;
 
+    endereco = item.endereco ? item.endereco : endereco
+
+
     document.addEventListener('DOMContentLoaded', function () {
       var elems = document.querySelectorAll('.chips');
       var instances = M.Chips.init(elems,
@@ -313,93 +325,94 @@ class Clientes extends Component {
     });
     return !item ? (<></>) :
       (
-        <div id="modal_edit" class="modal modal-fixed-footer">
+        <div id="modal_edit" className={"modal " + (item.id? 'modal-fixed-footer' : '')}>
           <div class="modal-content">
             <h4>{item.nome}</h4>
 
-            <div class="row">
-              <form action="#">
+            <form action="#">
 
-                <div class="row">
-                  <div class="input-field col s12 m6">
-                    <input
-                      class="input-group form-control"
-                      value={item.nome}
-                      onChange={e => { item.nome = e.target.value; this.setState({ item }) }}
-                    />
-                    <label class="active" for="last_name">Nome</label>
-                  </div>
-                  <div class="input-field col s12 m6">
-                    <input
-                      class="input-group form-control"
-                      type="number"
-                      value={item.cpf}
-                      onChange={e => { item.cpf = e.target.value; this.setState({ item }) }}
-                    />
-                    <label class="active" for="last_name">Cpf</label>
-                  </div>
-
-
-                  <div class="input-field col s12 m6">
-                    <input
-                      class="input-group form-control"
-                      type="number"
-                      value={endereco.cep}
-                      onChange={e => { endereco.cep = e.target.value; this.setState({ endereco }) }} />
-                    <label class="active" for="last_name">Cep</label>
-                  </div>
-                  <div class="input-field col s12 m6">
-                    <input
-                      class="input-group form-control"
-                      value={endereco.complemento}
-
-                      onChange={e => { endereco.complemento = e.target.value; this.setState({ endereco }) }} />
-                    <label class="active" for="last_name">Complemento</label>
-                  </div>
-
-
-                  <div class="input-field col s12 m4">
-                    <input
-                      class="input-group form-control"
-                      value={endereco.logradouro}
-
-                      onChange={e => { endereco.logradouro = e.target.value; this.setState({ endereco }) }} />
-                    <label class="active" for="last_name">Logradouro</label>
-                  </div>
-
-                  <div class="input-field col s12 m3">
-                    <input
-                      class="input-group form-control"
-                      value={endereco ? endereco.bairro : ''}
-
-                      onChange={e => { endereco.bairro = e.target.value; this.setState({ endereco }) }} />
-                    <label class="active" for="last_name">Bairro</label>
-                  </div>
-
-                  <div class="input-field col s12 m3">
-                    <input
-                      class="input-group form-control"
-                      value={endereco.cidade}
-
-                      onChange={e => { endereco.cidade = e.target.value; this.setState({ endereco }) }} />
-                    <label class="active" for="last_name">Cidade</label>
-                  </div>
-
-                  <div class="input-field col s12 m2">
-                    <input
-                      class="input-group form-control"
-                      value={item.endereco ? item.endereco.uf : ''}
-
-                      onChange={e => { item.endereco.uf = e.target.value; this.setState({ item }) }} />
-                    <label class="active" for="last_name">UF</label>
-                  </div>
-
-
+              <div class="row">
+                <div class="input-field col s12 m6">
+                  <input
+                    class="input-group form-control"
+                    value={item.nome}
+                    onChange={e => { item.nome = e.target.value; this.setState({ item }) }}
+                  />
+                  <label class="active" for="last_name">Nome</label>
+                </div>
+                <div class="input-field col s12 m6">
+                  <input
+                    class="input-group form-control"
+                    type="number"
+                    value={item.cpf}
+                    onChange={e => { item.cpf = e.target.value; this.setState({ item }) }}
+                  />
+                  <label class="active" for="last_name">Cpf</label>
                 </div>
 
-              </form>
-            </div>
 
+                <div class="input-field col s12 m6">
+                  <input
+                    class="input-group form-control"
+                    type="number"
+                    value={endereco.cep}
+                    onChange={e => { endereco.cep = e.target.value; this.setState({ endereco }) }} />
+                  <label class="active" for="last_name">Cep</label>
+                </div>
+                <div class="input-field col s12 m6">
+                  <input
+                    class="input-group form-control"
+                    value={endereco.complemento}
+
+                    onChange={e => { endereco.complemento = e.target.value; this.setState({ endereco }) }} />
+                  <label class="active" for="last_name">Complemento</label>
+                </div>
+
+
+                <div class="input-field col s12 m4">
+                  <input
+                    class="input-group form-control"
+                    value={endereco.logradouro}
+
+                    onChange={e => { endereco.logradouro = e.target.value; this.setState({ endereco }) }} />
+                  <label class="active" for="last_name">Logradouro</label>
+                </div>
+
+                <div class="input-field col s12 m3">
+                  <input
+                    class="input-group form-control"
+                    value={endereco ? endereco.bairro : ''}
+
+                    onChange={e => { endereco.bairro = e.target.value; this.setState({ endereco }) }} />
+                  <label class="active" for="last_name">Bairro</label>
+                </div>
+
+                <div class="input-field col s12 m3">
+                  <input
+                    class="input-group form-control"
+                    value={endereco.cidade}
+
+                    onChange={e => { endereco.cidade = e.target.value; this.setState({ endereco }) }} />
+                  <label class="active" for="last_name">Cidade</label>
+                </div>
+
+                <div class="input-field col s12 m2">
+                  <input
+                    class="input-group form-control"
+                    value={endereco.uf}
+
+                    onChange={e => { endereco.uf = e.target.value; this.setState({ endereco }) }} />
+                  <label class="active" for="last_name">UF</label>
+                </div>
+
+
+              </div>
+
+            </form>
+            <div  className={'section ' + (!item.id ? 'hide' : '')} >
+              {this.modal_edit_telefones()}
+              {this.modal_edit_emails()}
+            </div>
           </div>
           <div class="modal-footer">
             <a className={'modal-close waves-effect waves-green btn-flat left ' + (!item.id ? 'hide' : '')} onClick={() => this.open_Modal("modal_telefones", item)}>TELEFONES</a>
@@ -407,13 +420,71 @@ class Clientes extends Component {
 
 
             <a class="modal-close waves-effect btn-flat">Voltar</a>
-            <a className="modal-close waves-effect  btn-flat" onClick={() => {
+            <a className={'modal-close waves-effect  btn-flat ' + (item.id ? 'hide' : '')} onClick={() => {
+              item.endereco = endereco
+              this.setState({ item })
               item.id ? this.services_update(item) : this.services_create(item)
             }}> Salvar </a>
           </div>
 
         </div>
       )
+  }
+
+  modal_edit_telefones() {
+    let { telefones } = this.state.item
+    return (
+      <>
+        <table class="striped  responsive-table ">
+          <thead>
+            <tr>
+              <th><a onClick={() => Tools.ordernarAZ(this, telefones, 'tipoTelefone')}>Tipo</a></th>
+              <th><a onClick={() => Tools.ordernarAZ(this, telefones, 'numero')}>Número</a></th>
+              <th>Registrado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {!telefones ? '' : telefones.map((item) => {
+              return (
+                <tr key={item.id}>
+                  <td> {item.tipoTelefone} </td>
+                  <td>{item.numero}</td>
+                  <td>{Tools.DataFormat(item.createdAt)}</td>
+
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </>
+    )
+  }
+
+  modal_edit_emails() {
+    let { emails } = this.state.item
+    return (
+      <>
+        <table class="striped  responsive-table ">
+          <thead>
+            <tr>
+              <th><a onClick={() => Tools.ordernarAZ(this, emails, 'tipoTelefone')}>Email</a></th>
+              <th>Registrado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {!emails ? '' : emails.map((item) => {
+              return (
+                <tr key={item.id}>
+                  <td>{item.email}</td>
+                  <td>{Tools.DataFormat(item.createdAt)}</td>
+
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </>
+    )
   }
 
   render() {

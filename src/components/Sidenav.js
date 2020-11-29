@@ -18,8 +18,8 @@ function Sidenav(props) {
             <li>
                 <div class="user-view grey darken-4">
 
-                    <a href="#user" ><img class="circle" src={ props.usuario? props.usuario.photo_url : 'https://www.travelcontinuously.com/wp-content/uploads/2018/04/empty-avatar.png'} /></a>
-                    <a href="#name"><span class="white-text name"> {props.usuario ? props.usuario.nome : "Teste Teste"}</span></a>
+                    <a href="#user" ><img class="circle" src={ props.usuario && props.usuario.photo_url ? props.usuario.photo_url : 'https://www.travelcontinuously.com/wp-content/uploads/2018/04/empty-avatar.png'} /></a>
+                    <a href="#name"><span class="white-text name"> {props.usuario ? props.usuario.username : "Teste Teste"}</span></a>
                     <a href="#email"><span class="white-text email">{props.usuario ? props.usuario.email : "teste@teste.teste"}</span></a>
                 </div>
             </li>
