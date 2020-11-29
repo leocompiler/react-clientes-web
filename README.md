@@ -1,6 +1,7 @@
 # React Clientes Web 1.0
-* Sistema web para demostrar desenvolvimento de tecnologias Web e Server.
+* Sistema web desenvolvido para demostrar tecnologias e suas aplicações.
 * Aplicativo para gestão de clientes, foi desenvolvido com ReactJs e MaterializeCSS.
+* Para acessar, registrar e outros deve configurar o serviço [server](https://github.com/leocompiler/spring-web-clientes)
  # Tecnologias
 <ul>
 <li> React 17.0.1 </li>
